@@ -1,0 +1,10 @@
+[user]
+	        name = nfantaske
+	        email = fantaske@gmail.com
+[core]
+	        editor = vim
+[alias]
+	        ci = commit
+			st = status -uno
+			unstage = "reset HEAD -- "
+			last = log -1 HEAD
