@@ -1,7 +1,15 @@
 #!/bin/bash
 
-kern_path=/home/zybo/zybo_desc/zybo_kernel
+kern_path=/home/nf/git/linux_xilinx
 deb_root=$PWD/root/
+sd_card=/dev/disk/by-id/usb-Generic_MassStorageClass_000000001538-0:1-part1
+sd_mount=/home/nf/sdcard
+
+release="jesse"
+
+[ "$1_" = "buster_" ] && {
+	release="buster"
+}
 
 punt(){
 	echo "Exiting early"
@@ -13,7 +21,7 @@ echo "$kern_path"
 
 sudo rm -r root/
 
-multistrap -a armel -d $PWD/root -f multistrap.conf && {
+multistrap -a armel -d $PWD/root -f $release.conf && {
 	sudo cp -r /lib/firmware root/lib/
 	pushd $kern_path
 	make INSTALL_MOD_PATH=$deb_root modules_install
@@ -32,12 +40,14 @@ multistrap -a armel -d $PWD/root -f multistrap.conf && {
 
 [ -f /tmp/multistrap_done ] || punt
 
-sudo mount -t ext4 /dev/sdh2 ~/fs_zybo && {
-	sudo rm -r ~/fs_zybo/*
-	sudo cp -r root/* ~/fs_zybo
-	sudo chmod u+s ~/fs_zybo/usr/bin/sudo
+sudo mount -t ext4 $sd_card $sd_mount/ && {
+	sudo rm -r $sd_mount/*
+	sudo cp -r root/* $sd_mount/
+	sudo chmod u+s $sd_mount/usr/bin/sudo
 }
 
 sleep 30
 
-sudo umount ~/fs_zybo
+#qemu stuff to init the rootfs
+
+sudo umount $sd_mount
