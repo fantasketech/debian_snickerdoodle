@@ -1,17 +1,18 @@
-#!/bin/bash
-
-kern_path=/home/nf/git/linux-xlnx
+[ "$kern_path" == "" ] && {
+	kern_path=/home/nf/git/linux-xlnx
+}
 deb_root=$PWD/root/
-
 cp_err_flag=/tmp/zdeb_cp_err
 create_done=/tmp/multistrap_done
 
 image=snickerdoodle.img
-sandbox=/home/nf/git/zynq_box/sandbox
-release="jesse"
+[ "$sandbox" == "" ] && {
+	sandbox=/home/nf/git/zynq_bot/sandbox/
+}
+release="buster"
 
-[ "$1_" = "buster_" ] && {
-	release="buster"
+[ "$1_" = "jesse_" ] && {
+	release="jesse"
 }
 
 cp_err(){
@@ -23,7 +24,7 @@ punt(){
 	rm -rf $cp_err_flag
 	rm -rf $create_done
 	[ -z "$(ls -A $deb_root)" ] || {
-		sudo umount $deb_root
+		sudo umount -lf $deb_root
 	}
 	rm -rf $image
 	exit
@@ -52,13 +53,7 @@ sudo multistrap -a armhf -d $PWD/root -f $release.conf && {
 	sudo bash -c 'echo 'LANG=en_US.UTF-8' >> root/etc/default/locale' || cp_err
 	sudo bash -c 'echo "user ALL = NOPASSWD:ALL" >> root/etc/sudoers' || cp_err
 	sudo cp -f wpa.conf root/etc/dot_conf_examples || cp_err
-	sudo mkdir -p root/home/init/ || cp_err
-	sudo mkdir root/zybot
-	sudo cp .vimrc root/zybot/
-	sudo cp .screenrc root/zybot/
-	sudo cp .gitconfig root/zybot/
-	sudo cp .bashrc root/zybot/
-	[ -f $cp_err_flag ] || touch $create_done
+		[ -f $cp_err_flag ] || touch $create_done
 }
 
 [ -f $create_done ] || punt
@@ -66,16 +61,31 @@ sudo multistrap -a armhf -d $PWD/root -f $release.conf && {
 rm -rf $cp_err_flag
 rm -rf $create_done
 
+sudo umount -lf root/
+
+sleep 3
+
+sudo mount -oloop $image root/
+
 for f in dev dev/pts sys proc run ; do sudo mount --bind /$f root/$f ; done
 
 sudo cp /usr/bin/qemu-arm-static root/usr/bin
 sudo cp init_packages.sh root/usr/bin
 cd root/
+sudo update-binfmts --enable qemu-arm
 sudo chroot . bin/bash
 
 sleep 3
 
+cd ..
+
+sudo cp .vimrc root/home/user/
+sudo cp .screenrc root/home/user/
+sudo cp .gitconfig root/home/user/
+sudo cp .bashrc root/home/user/
+
 for f in dev dev/pts sys proc run ; do sudo umount root/$f ; done
 
-#sudo umount -lf root/
-#cp -v $image $sandbox
+sudo umount -lf $deb_root
+
+cp -v $image $sandbox && rm -f $image
