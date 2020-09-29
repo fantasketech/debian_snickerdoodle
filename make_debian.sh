@@ -1,5 +1,5 @@
 [ "$kern_path" == "" ] && {
-	kern_path=/home/nf/git/linux-xlnx
+	kern_path=/home/nf/git/linux_snickerdoodle
 }
 deb_root=$PWD/root/
 cp_err_flag=/tmp/zdeb_cp_err
@@ -52,7 +52,7 @@ sudo multistrap -a armhf -d $PWD/root -f $release.conf && {
 	sudo cp interfaces root/etc/network/ || cp_err
 	sudo bash -c 'echo 'LANG=en_US.UTF-8' >> root/etc/default/locale' || cp_err
 	sudo bash -c 'echo "user ALL = NOPASSWD:ALL" >> root/etc/sudoers' || cp_err
-	sudo cp -f wpa.conf root/etc/dot_conf_examples || cp_err
+	sudo cp -f wpa.conf root/etc/wpa.conf || cp_err
 		[ -f $cp_err_flag ] || touch $create_done
 }
 
@@ -60,6 +60,8 @@ sudo multistrap -a armhf -d $PWD/root -f $release.conf && {
 
 rm -rf $cp_err_flag
 rm -rf $create_done
+
+sudo bash -c "sudo echo 'root::0:0:root:/root:/bin/bash' > root/etc/passwd"
 
 sudo umount -lf root/
 
@@ -83,8 +85,17 @@ sudo cp .vimrc root/home/user/
 sudo cp .screenrc root/home/user/
 sudo cp .gitconfig root/home/user/
 sudo cp .bashrc root/home/user/
+sudo cp ttyPS0.conf root/etc/init/
 
-for f in dev dev/pts sys proc run ; do sudo umount root/$f ; done
+sudo chown 1000:1000 root/home/user
+sudo chown 1000:1000 root/home/user/.*
+
+sudo mkdir -p root/boot/
+
+sudo cp $kern_path/arch/arm/boot/uImage root/boot/
+sudo cp $sandbox/base_wrapper.bit root/boot/
+
+for f in dev/pts dev sys proc run ; do sudo umount root/$f ; done
 
 sudo umount -lf $deb_root
 

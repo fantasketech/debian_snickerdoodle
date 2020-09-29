@@ -1,0 +1,9 @@
+# multistrap may need altered to allow unsigned repo
+# You need to patch /usr/sbin/multistrap:
+
+#Look for the line
+#$config_str .= " -o Apt::Get::AllowUnauthenticated=true"
+#Just above it, add
+#$config_str .= " -o Acquire::AllowInsecureRepositories=true";
+
+apt-get install multistrap qemu qemu-user-static binfmt-support
