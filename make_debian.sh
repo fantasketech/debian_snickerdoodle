@@ -52,16 +52,18 @@ sudo multistrap -a armhf -d $PWD/root -f $release.conf && {
 	sudo cp interfaces root/etc/network/ || cp_err
 	sudo bash -c 'echo 'LANG=en_US.UTF-8' >> root/etc/default/locale' || cp_err
 	sudo bash -c 'echo "user ALL = NOPASSWD:ALL" >> root/etc/sudoers' || cp_err
+	sudo bash -c "sudo echo 'root::0:0:root:/root:/bin/bash' > root/etc/passwd"
 	sudo cp -f wpa.conf root/etc/wpa.conf || cp_err
-		[ -f $cp_err_flag ] || touch $create_done
+	sudo cp -f resolv.conf root/etc/resolv.conf || cp_err
+	sudo cp -f network-wireless@.service root/etc/systemd/system/ || cp_err
+	sudo cp -f connect_wpa.sh root/etc/wpa_supplicant/ || cp_err
+	[ -f $cp_err_flag ] || touch $create_done
 }
 
 [ -f $create_done ] || punt
 
 rm -rf $cp_err_flag
 rm -rf $create_done
-
-sudo bash -c "sudo echo 'root::0:0:root:/root:/bin/bash' > root/etc/passwd"
 
 sudo umount -lf root/
 

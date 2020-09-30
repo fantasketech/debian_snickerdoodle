@@ -15,3 +15,9 @@ echo "127.0.0.1	zynqbot" >> /etc/hosts
 echo "zynqbot" >> /etc/hostname
 
 rm /bin/sh ; ln -s /bin/bash /bin/sh
+
+ln -s /etc/systemd/system/network-wireless@.service /etc/systemd/system/multi-user.target.wants/network-wireless@wlan0.service
+
+rm /etc/systemd/system/multi-user.target.wants/wpa_supplicant.service
+
+passwd -l root

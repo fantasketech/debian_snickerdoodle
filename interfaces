@@ -2,13 +2,9 @@
 auto lo
 iface lo inet loopback
 
+auto wlan0
 allow-hotplug wlan0
-
 iface wlan0 inet dhcp
-        wpa-driver nl80211
+		wpa-driver nl80211
         wpa-conf /etc/wpa.conf
-
-#auto eth0
-#allow-hotplug eth0
-#iface eth0 inet dhcp
 
