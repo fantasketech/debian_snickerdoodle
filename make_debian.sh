@@ -95,7 +95,9 @@ sudo chown 1000:1000 root/home/user/.*
 sudo mkdir -p root/boot/
 
 sudo cp $kern_path/arch/arm/boot/uImage root/boot/
-sudo cp $sandbox/base_wrapper.bit root/boot/
+sudo cp $sandbox/system.bit root/boot/
+sudo cp $sandbox/boot.bin root/boot/
+sudo cp $sandbox/devicetree.dtb root/boot/
 
 for f in dev/pts dev sys proc run ; do sudo umount root/$f ; done
 
