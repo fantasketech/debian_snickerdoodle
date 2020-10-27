@@ -51,6 +51,8 @@ sudo multistrap -a armhf -d $PWD/root -f $release.conf && {
 	sudo mkdir -p root/etc/init/ || cp_err
 	sudo cp interfaces root/etc/network/ || cp_err
 	sudo bash -c 'echo 'LANG=en_US.UTF-8' >> root/etc/default/locale' || cp_err
+	sudo bash -c 'echo 'LANGUAGE=en_US.UTF-8' >> root/etc/default/locale' || cp_err
+	sudo bash -c 'echo 'LC_ALL=en_US.UTF-8' >> root/etc/default/locale' || cp_err
 	sudo bash -c 'echo "user ALL = NOPASSWD:ALL" >> root/etc/sudoers' || cp_err
 	sudo bash -c "sudo echo 'root::0:0:root:/root:/bin/bash' > root/etc/passwd"
 	sudo cp -f wpa.conf root/etc/wpa.conf || cp_err
